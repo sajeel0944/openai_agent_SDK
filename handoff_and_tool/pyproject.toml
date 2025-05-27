@@ -1,0 +1,11 @@
+[project]
+name = "handoff-and-tool"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "litellm>=1.0.0",
+    "openai-agent>=0.1.0",
+]
