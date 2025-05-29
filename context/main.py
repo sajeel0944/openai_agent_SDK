@@ -22,7 +22,7 @@ class UserInfo:
 
 name : str = input("Enter Your Name : ")
 age : str = int(input("Enter Your Age : "))
-location : str = input("Enter Your Location ")
+location : str = input("Enter Your Location : ")
 
 if name and age and  location:
     print("\nAsk To AI About You\n")
