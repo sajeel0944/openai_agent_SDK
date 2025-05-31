@@ -10,12 +10,14 @@ from agents import (
     RunContextWrapper,
     TResponseInputItem,
     input_guardrail,
+    enable_verbose_stdout_logging
 )
 
 from dotenv import load_dotenv 
 import os
 
 load_dotenv()
+# enable_verbose_stdout_logging()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -36,7 +38,7 @@ config = RunConfig(
 )
 
 
-## is main LLM ka response aye ga 
+## is main guardrail_agent LLM ka response aye ga 
 class CodingHelpingOutput(BaseModel):
     is_coding : bool ## agar user ny coding ka question pouch to is main True aye ga agar user ny koye or question pouch to is main False aye ga
     response : str ## is main LLM ka respone aye ga
@@ -65,8 +67,8 @@ async def coding_guardrail(
 
 ## ye main agent hai
 agent = Agent(
-    name = "customer support agent",
-    instructions="You are a customer support agent. You help customers with their questions.",
+    name = "coding agent",
+    instructions="You are a coding agent. You help user with their questions.",
     input_guardrails=[coding_guardrail] ## Yeh guardrail use karega jo CodingHelpingOutput return karta hai
 )
 
