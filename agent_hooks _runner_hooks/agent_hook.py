@@ -11,7 +11,7 @@ load_dotenv()
 #----------------------------------------------------------------------------
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-BASE_URL = "https://generativelanguage.googleapis.com/v1beta/"  # Make sure this is valid for Gemini
+BASE_URL = "https://generativelanguage.googleapis.com/v1beta/"  
 
 #----------------------------------------------------------------------------
 
