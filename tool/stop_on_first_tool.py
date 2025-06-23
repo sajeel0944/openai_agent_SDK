@@ -31,7 +31,7 @@ run_fig = RunConfig(
     tracing_disabled=True,
 )
 
-#---------------------------------------------------------------------
+#-----------------------------stop_on_first_tool--------------------------------------------
 
 @function_tool
 def add(num1: int, num2 : int) -> int:
@@ -48,6 +48,8 @@ agent = Agent(
     tool_use_behavior="stop_on_first_tool",  # llm add tool call karry ga lakin add tool wrong answer return lakin wo wrong answer llm ky pass nhi jaye ga 
     model=model,
 )
+
+#--------------------------------------Runner----------------------------------------------
 
 response = Runner.run_sync(agent, "what is 4 plus 4")
 print(response.final_output)

@@ -2,14 +2,25 @@ from agents import Agent,  Runner, function_tool, set_tracing_disabled, enable_v
 from agents.extensions.models.litellm_model import LitellmModel
 from dotenv import load_dotenv
 import os
+import litellm
+
+#-----------------------------------------------------------------------------------
 
 enable_verbose_stdout_logging()
 set_tracing_disabled(disabled=True)
-
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+#-----------------------------------------------------------------------------------
+
+# 🔕 output main litellm ki kuch warning arahe thi is sy warning nhi aye gi
+litellm.disable_aiohttp_transport=True
+
+#-----------------------------------------------------------------------------------
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MODEL = "gemini/gemini-1.5-flash"
+
+#-----------------------------------------------------------------------------------
 
 sajeel_information = Agent(
     name="sajeel_information_agent",
@@ -23,7 +34,7 @@ sajeel_information = Agent(
     Jab bhi Sajeel ki personal life ya career ke bare mein puchen to mujhe handoff karo.
     """,
     handoff_description="Sajeel ki personal information ke liye",
-    model=LitellmModel(model=MODEL, api_key=OPENAI_API_KEY),
+    model=LitellmModel(model=MODEL, api_key=GEMINI_API_KEY),
 )
 
 sajeel_social_media = Agent(
@@ -38,7 +49,7 @@ sajeel_social_media = Agent(
     Social media links mangne par turant ye links provide karo.
     """,
     handoff_description="Sajeel ke social media links ke liye",
-    model=LitellmModel(model=MODEL, api_key=OPENAI_API_KEY),
+    model=LitellmModel(model=MODEL, api_key=GEMINI_API_KEY),
 )
 
 sajeel_location = Agent(
@@ -51,8 +62,10 @@ sajeel_location = Agent(
     Location, address ya Google Maps link puchen to ye information provide karo.
     """,
     handoff_description="Sajeel ki location ke liye",
-    model=LitellmModel(model=MODEL, api_key=OPENAI_API_KEY),
+    model=LitellmModel(model=MODEL, api_key=GEMINI_API_KEY),
 )
+
+#-------------------------------main agent----------------------------------------------------
 
 sajeel_agent = Agent(
     name="sajeel_assistant",
@@ -86,9 +99,10 @@ sajeel_agent = Agent(
                 tool_description="Translate the user's message to sajeel_location"
             )
         ],
-    model=LitellmModel(model=MODEL, api_key=OPENAI_API_KEY),
+    model=LitellmModel(model=MODEL, api_key=GEMINI_API_KEY),
 )
 
+#-------------------------------------Runner----------------------------------------------
 
 result = Runner.run_sync(sajeel_agent, "mujy tum sajeel ki social media ki link dydo")
 print(result.final_output)
