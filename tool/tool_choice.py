@@ -29,6 +29,9 @@ def say_hello() -> str:
     print("called say_hello tool")
     return ("hello user")
 
+
+#------------------------------------Forcing tool use----------------------------
+
 #-----------------------------------auto------------------------------------------------
 
 print("\t\t\tauto\n")

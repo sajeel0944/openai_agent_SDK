@@ -9,28 +9,27 @@ set_tracing_disabled(disabled=True)
 # .env file load karo
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MODEL = "gemini/gemini-1.5-flash"
 
 
 #                                   streaming Text code
 
-async def main():
+# async def main():
 
-    agent = Agent(
-        name = "agent",
-        instructions="",
-        model=LitellmModel(model=MODEL, api_key=OPENAI_API_KEY)
-    )
+#     agent = Agent(
+#         name = "agent",
+#         instructions="",
+#         model=LitellmModel(model=MODEL, api_key=GEMINI_API_KEY)
+#     )
 
 
-    result = Runner.run_streamed(agent, "give me 100 eassy in AI")
+#     result = Runner.run_streamed(agent, "give me 100 eassy in AI")
 
-    async for event  in result.stream_events():
-        print(event, end="", flush=True)
+#     async for event  in result.stream_events():
+#         print(event, end="", flush=True)
 
-asyncio.run(main())
+# asyncio.run(main())
 
 
 
@@ -50,12 +49,12 @@ async def main():
         name="news assistant",
         instructions="You are a news agent. You provide the latest AI news.",
         tools=[news],
-        model=LitellmModel(model=MODEL, api_key=OPENAI_API_KEY)
+        model=LitellmModel(model=MODEL, api_key=GEMINI_API_KEY)
     )
 
     result = Runner.run_streamed(
         agent,
-        input="Give me the latest AI news",
+        input="give me 100 word eassy in AI",
 
     )
     print("=== Run starting ===")
