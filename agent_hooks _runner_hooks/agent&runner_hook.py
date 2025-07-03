@@ -1,9 +1,8 @@
 import asyncio
 from typing import Any
-from agents import Agent, ModelSettings, Runner, RunConfig, AsyncOpenAI, OpenAIChatCompletionsModel, AgentHooks, RunContextWrapper, Tool, function_tool, set_tracing_disabled
+from agents import Agent, ModelSettings, RunHooks, Runner, RunConfig, AsyncOpenAI, OpenAIChatCompletionsModel, AgentHooks, RunContextWrapper, Tool, Usage, function_tool, set_tracing_disabled
 from dotenv import load_dotenv
 import os
-from pydantic import BaseModel
 
 #----------------------------------------------------------------------------
 
@@ -32,46 +31,53 @@ run_config = RunConfig(
     model_provider=external_client,
     tracing_disabled=True,
 )
+ 
 
-#---------------------------------Example One-------------------------------------------
+# ----------------------------------------RunHooks-----------------------------------------------------
 
-print("\nExample One\n")
+class CustomRunnerHooks(RunHooks):
+    def __init__(self):
+        self.event_counter = 0
 
-class MytestData(BaseModel):
-    name: str
-    age: int
+    def _usage_to_str(self, usage: Usage) -> str:
+        return f"\n{usage.requests} requests, {usage.input_tokens} input tokens, {usage.output_tokens} output tokens, {usage.total_tokens} total tokens"
 
-class MyCustomAgentHook(AgentHooks):
-    async def on_start(self, context: RunContextWrapper[MytestData], agent: Agent):
-        print(f"Agent: '{agent.name}' \nhook: {agent.hooks}, \ninstructions: {agent.instructions},  started.\n")
+    async def on_agent_start(self, context: RunContextWrapper, agent: Agent) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Agent {agent.name} started. Usage: {self._usage_to_str(context.usage)}"
+        )
 
-    async def on_end(self, context: RunContextWrapper[MytestData], agent: Agent, output):
-        print(f"Agent '{agent.name}' for {context.context.name} and my age is {context.context.age} ended with output: {output}")
+    async def on_agent_end(self, context: RunContextWrapper, agent: Agent, output: Any) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Agent {agent.name} ended with output {output}. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+    async def on_tool_start(self, context: RunContextWrapper, agent: Agent, tool: Tool) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Tool {tool.name} started. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+    async def on_tool_end(
+        self, context: RunContextWrapper, agent: Agent, tool: Tool, result: str
+    ) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Tool {tool.name} ended with result {result}. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+    async def on_handoff(
+        self, context: RunContextWrapper, from_agent: Agent, to_agent: Agent
+    ) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Handoff from {from_agent.name} to {to_agent.name}. Usage: {self._usage_to_str(context.usage)}"
+        )
 
 
-# ✅ Create instance properly
-test_data = MytestData(name="sajeel", age=19)
-
-my_agent = Agent(
-    name="assistant",
-    instructions="you are a helpful assistant",
-    hooks=MyCustomAgentHook(),
-    model=model
-)
-
-# ✅ Run agent with context 
-response = Runner.run_sync(
-    my_agent,
-    input="hello, how are you",
-    context=test_data,
-)
-
-print("Final Response:", response.final_output)
-
-
-# ----------------------Example Two------------------------------
-
-print("\nExample Two\n")
+# ----------------------------------------------AgentHooks------------------------------------------------
 
 class CustomAgentHooks(AgentHooks):
     def __init__(self, display_name: str):
@@ -80,7 +86,7 @@ class CustomAgentHooks(AgentHooks):
 
     async def on_start(self, context: RunContextWrapper, agent: Agent) -> None:
         self.event_counter += 1
-        print(f"### ({self.display_name}) {self.event_counter}: Agent {agent.name} started")
+        print(f"###\n ({self.display_name}) {self.event_counter}: Agent {agent.name} started")
 
     async def on_end(self, context: RunContextWrapper, agent: Agent, output: Any) -> None:
         self.event_counter += 1
@@ -108,6 +114,8 @@ class CustomAgentHooks(AgentHooks):
             f"### ({self.display_name}) {self.event_counter}: Agent {agent.name} ended tool {tool.name} with result {result}"
         )
 
+
+runner_hooks = CustomRunnerHooks()
 
 @function_tool
 def multiply(num1: int, num2: int):
@@ -170,6 +178,7 @@ async def main() -> None:
     response = await Runner.run(
         start_agent,
         input=f"{user_input}.",
+        hooks=runner_hooks,
     )
 
     print(response.final_output)

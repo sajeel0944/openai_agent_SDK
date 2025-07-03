@@ -1,4 +1,6 @@
-from agents import Agent, Runner, RunConfig, AsyncOpenAI, OpenAIChatCompletionsModel, RunHooks, RunContextWrapper, set_tracing_disabled
+import asyncio
+from typing import Any
+from agents import Agent, Runner, RunConfig, AsyncOpenAI, OpenAIChatCompletionsModel, RunHooks, RunContextWrapper, Tool, Usage, function_tool, set_tracing_disabled
 from dotenv import load_dotenv
 import os
 from pydantic import BaseModel
@@ -31,7 +33,9 @@ run_config = RunConfig(
     tracing_disabled=True,
 )
 
-#----------------------------------------------------------------------------
+#--------------------------------Example one--------------------------------------------
+
+print("\nExample One\n")
 
 class MytestData(BaseModel): # is ky andar user ka name or age aye gi
     name: str
@@ -64,3 +68,125 @@ response = Runner.run_sync(
 )
 
 print("Final Response:", response.final_output)
+
+
+#--------------------------------Example two--------------------------------------------
+
+print("\nExample Two\n")
+
+class CustomRunnerHooks(RunHooks):
+    def __init__(self):
+        self.event_counter = 0
+
+    def _usage_to_str(self, usage: Usage) -> str:
+        return f"{usage.requests} requests, {usage.input_tokens} input tokens, {usage.output_tokens} output tokens, {usage.total_tokens} total tokens"
+
+    async def on_agent_start(self, context: RunContextWrapper, agent: Agent) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Agent {agent.name} started. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+    async def on_agent_end(self, context: RunContextWrapper, agent: Agent, output: Any) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Agent {agent.name} ended with output {output}. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+    async def on_tool_start(self, context: RunContextWrapper, agent: Agent, tool: Tool) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Tool {tool.name} started. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+    async def on_tool_end(
+        self, context: RunContextWrapper, agent: Agent, tool: Tool, result: str
+    ) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Tool {tool.name} ended with result {result}. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+    async def on_handoff(
+        self, context: RunContextWrapper, from_agent: Agent, to_agent: Agent
+    ) -> None:
+        self.event_counter += 1
+        print(
+            f"### {self.event_counter}: Handoff from {from_agent.name} to {to_agent.name}. Usage: {self._usage_to_str(context.usage)}"
+        )
+
+
+hooks = CustomRunnerHooks()
+
+###
+
+
+@function_tool
+def multiply(num1: int, num2: int):
+    """
+    this is multiply agent
+    num1 : int 
+    num2 : int
+    """
+    return f"multiple {num1*num2}"
+
+
+@function_tool
+def addition(num1: int, num2: int):
+    """
+    this is addition agent
+    num1 : int 
+    num2 : int
+    """
+    return f"addition {num1*num2}"
+
+@function_tool
+def minus(num1: int, num2: int):
+    """
+    this is minus agent
+    num1 : int 
+    num2 : int
+    """
+    return f"minus {num1*num2}"
+
+@function_tool
+def division(num1: int, num2: int):
+    """
+    this is division agent
+    num1 : int 
+    num2 : int
+    """
+    return f"division {num1*num2}"
+
+
+calculator_agent = Agent(
+    name="calculator Agent",
+    instructions="you are calculator agent",
+    tools=[multiply, division, minus, addition],
+    model=model
+)
+
+start_agent = Agent(
+    name="assistant",
+    instructions="you are helpful agent",
+    handoffs=[calculator_agent],
+    model=model,
+)
+
+
+async def main() -> None:
+    user_input = input("Enter Number: ")
+    response = await Runner.run(
+        start_agent,
+        input=f"{user_input}.",
+        hooks=hooks,
+    )
+    
+    print(response.final_output)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
+
