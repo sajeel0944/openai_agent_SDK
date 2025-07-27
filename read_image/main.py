@@ -76,7 +76,7 @@ async def main():
             },
             {
                 "role": "user",
-                "content": "What do you see in this image?",
+                "content": "mujy ye bata o ky is image main kia kia hai detail main batao roman urdu main",
             },
         ],
     )

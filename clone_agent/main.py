@@ -55,4 +55,4 @@ sajeel_agent = saif_agent.clone(
 
 # Run the cloned agent synchronously with a user query
 response = Runner.run_sync(sajeel_agent, "What is your name?")
-print(response.final_output)
+print(response.final_outp)
