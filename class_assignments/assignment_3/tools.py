@@ -229,7 +229,6 @@ def order_information(email) -> list[dict]:
       ```
     * Ensure the environment variable **`MONGODP`** (typo?) actually contains
       your MongoDB URI, e.g.  
-      `MONGODP=mongodb+srv://user:pass@cluster0.mongodb.net`
     """
     try:
         mongodp =  os.getenv("mongodp")
