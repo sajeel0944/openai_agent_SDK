@@ -97,3 +97,6 @@ try:
     print(result.final_output)
 except InputGuardrailTripwireTriggered: # Agar guardrail ne detect kiya ke yeh coding ka sawal nahi hai, to yeh exception trigger hoga
     print("coding guardrail tripped")
+
+# Note
+# input_guardrail ye hamain frist agent par chaly ga
