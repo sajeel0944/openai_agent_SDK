@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from agents import (
+    AgentOutputSchema,
     RunConfig, 
     Agent, 
     Runner, 
@@ -47,7 +48,7 @@ class CodingHelpingOutput(BaseModel):
 guardrail_agent = Agent(
     name = "coding check",
     instructions = "Check if the user is asking you to do their coding.",
-    output_type = CodingHelpingOutput
+    output_type = AgentOutputSchema(CodingHelpingOutput, strict_json_schema=False)
 )
 
 
