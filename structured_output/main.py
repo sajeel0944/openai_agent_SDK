@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from agents import Agent, Runner, RunConfig, AsyncOpenAI, OpenAIChatCompletionsModel, enable_verbose_stdout_logging
+from agents import Agent, AgentOutputSchema, Runner, RunConfig, AsyncOpenAI, OpenAIChatCompletionsModel, enable_verbose_stdout_logging
 from pydantic import BaseModel
 
 load_dotenv()
@@ -37,7 +37,7 @@ class WeatherAnswer(BaseModel):
 agent = Agent(
   name="StructuredWeatherAgent",
   instructions="Use the final_output tool with WeatherAnswer schema. ",
-  output_type=WeatherAnswer
+  output_type=AgentOutputSchema(WeatherAnswer, strict_json_schema=False)
 )
 
 
