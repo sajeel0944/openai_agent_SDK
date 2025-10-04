@@ -16,7 +16,7 @@ set_tracing_disabled(disabled=True)
 #----------------------------------------------------------------
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL = "gemini-2.0-flash"
+MODEL = "gemini-2.5-flash"
 
 #----------------------------------------------------------------
 
@@ -40,7 +40,7 @@ config = RunConfig(
 # -------------------------------------------------------------------------------------------------------
 
 
-FILEPATH = os.path.join(os.path.dirname(__file__), "image_bison.jpg")
+FILEPATH = os.path.join(os.path.dirname(__file__), "images.png")
 
 
 def image_to_base64(image_path): ## is main image ko Base64 ky format main kar raha ho
@@ -57,7 +57,7 @@ async def main():
 
     agent = Agent(
         name="Assistant",
-        instructions="You are a helpful assistant.",
+        instructions="You are x ray read assistant you read x ray",
         model=model
     )
 
@@ -76,7 +76,7 @@ async def main():
             },
             {
                 "role": "user",
-                "content": "mujy ye bata o ky is image main kia kia hai detail main batao roman urdu main",
+                "content": "mujy ye bata o ky is x ray ky andar ki hai roman urdu main batao",
             },
         ],
     )
