@@ -73,13 +73,13 @@ def web_search_tool(query: str) -> str:
 @function_tool
 def read_website(url: str) -> str:
     """
-    Kisi bhi public website ka content fetch karta hai aur uska plain text extract karta hai (HTML ke bina).
+    Fetches the content of any public website and extracts its plain text (without HTML).
 
     Parameters:
-        url (str): Website ka full URL, jaise "https://en.wikipedia.org/wiki/OpenAI".
+        url (str): The website's full URL, for example "https://en.wikipedia.org/wiki/OpenAI".
 
     Returns:
-        str: Extracted plain text content (max 2000 characters). Agar koi error aaye to error message return karta hai.
+        str: The extracted plain text content (max 2000 characters). If an error occurs, returns an error message.
     """
     try:
         response = requests.get(url, timeout=10)
