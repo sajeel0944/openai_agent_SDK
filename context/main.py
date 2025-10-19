@@ -9,7 +9,7 @@ from agents.extensions.models.litellm_model import LitellmModel
 set_tracing_disabled(disabled=True)
 
 load_dotenv()
-
+# zxnjncjkxncdjknmn-zdjnkndkd
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL = "gemini/gemini-2.0-flash"
 
